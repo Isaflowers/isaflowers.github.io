@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Certificado FUN - Prueba</title>
+
+<!-- Biblioteca para convertir el certificado en PNG -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: #26152f;
+        color: white;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .modal {
+        background: #fff8fc;
+        color: #26152f;
+        width: min(95%, 650px);
+        padding: 30px;
+        border-radius: 18px;
+        text-align: center;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+    }
+
+    h2 {
+        color: #75405e;
+    }
+
+    p {
+        line-height: 1.5;
+    }
+
+    input {
+        width: 100%;
+        padding: 13px;
+        border: 1px solid #d9a4c4;
+        border-radius: 8px;
+        margin: 18px 0;
+        font-size: 16px;
+        outline: none;
+    }
+
+    input:focus {
+        border-color: #bd6f9e;
+        box-shadow: 0 0 0 3px rgba(217,138,184,0.15);
+    }
+
+    button {
+        background: #d98ab8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 13px 22px;
+        cursor: pointer;
+        font-weight: bold;
+        margin: 5px;
+        transition: 0.2s;
+    }
+
+    button:hover {
+        background: #bd6f9e;
+        transform: translateY(-2px);
+    }
+
+    .volver {
+        background: #76546b;
+    }
+
+    .volver:hover {
+        background: #5d4054;
+    }
+
+    #resultado {
+        display: none;
+    }
+
+    /* CONTENEDOR DEL CERTIFICADO */
+
+    #certificadoFinal {
+        position: relative;
+        width: 100%;
+        max-width: 750px;
+        margin: 20px auto;
+        overflow: hidden;
+        background: white;
+    }
+
+    #fondoCertificado {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    /* NOMBRE PERSONALIZADO */
+
+    #nombreCertificado {
+        position: absolute;
+        top: 53.5%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 85%;
+        text-align: center;
+        font-family: Georgia, serif;
+        font-size: 35px;
+        color: #75405e;
+        font-weight: normal;
+        overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 500px) {
+
+        .modal {
+            padding: 20px 15px;
+        }
+
+        #nombreCertificado {
+            font-size: 22px;
+        }
+
+    }
+
+</style>
+</head>
+
+<body>
+
+<div class="modal">
+
+    <!-- ESTADO 1: FORMULARIO -->
+
+    <section id="formulario">
+
+        <h2>¡Tu certificado te espera! ♡</h2>
+
+        <p>
+            Escribe tu nombre para personalizar
+            tu reconocimiento.
+        </p>
+
+        <input
+            type="text"
+            id="nombre"
+            placeholder="Escribe tu nombre..."
+            maxlength="35"
+            autocomplete="off"
+        >
+
+        <br>
+
+        <button onclick="generarCertificado()">
+            Generar mi certificado ♡
+        </button>
+
+    </section>
+
+
+    <!-- ESTADO 2: CERTIFICADO -->
+
+    <section id="resultado">
+
+        <h2>¡Tu certificado está listo! ♡</h2>
+
+        <p>
+            Ya puedes guardar tu reconocimiento.
+        </p>
+
+        <!-- IMAGEN FINAL CON NOMBRE -->
+
+        <div id="certificadoFinal">
+
+            <img
+                id="fondoCertificado"
+                src="Img/certificado.jpg"
+                alt="Certificado FUN"
+            >
+
+            <div id="nombreCertificado"></div>
+
+        </div>
+
+        <button onclick="descargarCertificado()">
+            Descargar certificado ♡
+        </button>
+
+        <button class="volver" onclick="volverFormulario()">
+            Volver
+        </button>
+
+    </section>
+
+</div>
+
+
+<script>
+
+// ELEMENTOS
+
+const campoNombre = document.getElementById("nombre");
+
+const formulario = document.getElementById("formulario");
+
+const resultado = document.getElementById("resultado");
+
+const fondoCertificado = document.getElementById("fondoCertificado");
+
+const nombreCertificado = document.getElementById("nombreCertificado");
+
+const certificadoFinal = document.getElementById("certificadoFinal");
+
+
+// GENERAR CERTIFICADO
+
+function generarCertificado() {
+
+    const nombre = campoNombre.value.trim();
+
+    if (!nombre) {
+
+        alert("Por favor, escribe tu nombre.");
+
+        return;
+
+    }
+
+    // Comprobar que el fondo esté cargado
+
+    if (!fondoCertificado.complete ||
+        fondoCertificado.naturalWidth === 0) {
+
+        alert(
+            "No se pudo cargar el certificado. " +
+            "Revisa Img/certificado.jpg"
+        );
+
+        return;
+
+    }
+
+    // Colocar el nombre
+
+    nombreCertificado.textContent = nombre;
+
+    // Ocultar formulario
+
+    formulario.style.display = "none";
+
+    // Mostrar certificado
+
+    resultado.style.display = "block";
+
+}
+
+
+// DESCARGAR CERTIFICADO PNG
+
+async function descargarCertificado() {
+
+    if (typeof htmlToImage === "undefined") {
+
+        alert("No se pudo cargar la biblioteca de descarga.");
+
+        return;
+
+    }
+
+    try {
+
+        await document.fonts.ready;
+
+        const imagen = await htmlToImage.toPng(
+            certificadoFinal,
+            {
+                pixelRatio: 2,
+                cacheBust: true
+            }
+        );
+        if (!imagen.startsWith("data:image/png")) {
+    throw new Error("La imagen generada no está en formato PNG.");
+}
+
+        const enlace = document.createElement("a");
+
+        enlace.download = "Mi-certificado-FUN.png";
+
+        enlace.href = imagen;
+
+        enlace.click();
+
+    }
+
+    catch (error) {
+
+        console.error("Error al generar PNG:", error);
+
+        alert(
+            "No se pudo generar el certificado. " +
+            "Revisa la consola para conocer el error."
+        );
+
+    }
+
+}
+
+
+// VOLVER AL FORMULARIO
+
+function volverFormulario() {
+
+    resultado.style.display = "none";
+
+    formulario.style.display = "block";
+
+    campoNombre.focus();
+
+}
+
+</script>
+
+</body>
+</html>
